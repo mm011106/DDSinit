@@ -8,7 +8,7 @@
 --
 -- 	Revised : エンティティを使ってカウンターを外部ユニットとして一般化
 --			REV 2.0 2020/04/20 Miyamoto
---       
+--
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -58,7 +58,7 @@ begin
 		generic map (WIDTH => 10, COUNT => 2**10-1)
 		port map    (EN => nRES, CLK => MCLK, Q => Q_DIV);
 	-- Internal CLK <= 1/2^6 MCLK (1MHz <- 67MHz)
-	
+
 	--	ADD_COUNT behavior:
 	--		Be set 00 on RES
 	-- 	Increase at the falling edge of the SYNC
@@ -122,8 +122,8 @@ begin
 --
 	FSYNC	<=	SYNC;
 
-	PSEL	<= '0';
-	FSEL	<=	'0';
+	PSEL	<= 	'0';
+	FSEL	<= 	'0';
 
 	RESET	<=	not(nRES);
 
