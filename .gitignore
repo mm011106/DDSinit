@@ -31,3 +31,6 @@
 !*.sdc
 # tcl files:
 !*.tcl
+
+# text file
+!*.txt

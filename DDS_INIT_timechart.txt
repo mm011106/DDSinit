@@ -1,0 +1,11 @@
+# Time chart data
+#  https://rawgit.com/osamutake/tchart-coffee/master/bin/editor-offline.html
+#
+
+@w_transient 2
+INT_CLK ~_~_~ _~_~_~_~_~_~_~_~_~_~_ ~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_ ~_~_~_~_~_~_~_~_~_~_
+@w_hold 22
+Q_SEQ =X33X32X31X30X29X28X27X26X X X X X X X X X X X X X X X X X X X X X X X3X2X1X0X33X32X
+SCLK  ~_~_~_~_~_~_~_~_~_~_ ~_~_~_~_~_~_~_~_~_
+FSYNC _ ~~ ________________________________~~_
+SDATA =?==XD15=XD14=XD13=XD12=XD11=XD10=XD9=XD8=XD7=XD6=XD5=XD4=XD3=XD2=XD1=XD0=X=?X
