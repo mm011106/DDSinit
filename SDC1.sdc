@@ -1,0 +1,1 @@
+create_clock -name MCLK -period 14.9012 [get_ports {MCLK}]

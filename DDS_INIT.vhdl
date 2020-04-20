@@ -6,8 +6,9 @@
 --		Combine with ER50_WALZER
 --			REV 1.0	2015/02/06 Miyamoto
 --
--- 		Revised : エンティティを使ってカウンターを外部ユニットとして一般化
-
+-- 	Revised : エンティティを使ってカウンターを外部ユニットとして一般化
+--			REV 2.0 2020/04/20 Miyamoto
+--       
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -53,43 +54,34 @@ constant COMMAND : MEMORY := (
 
 begin
 
+	PRESCALER: entity work.COUNTER_INC
+		generic map (WIDTH => 10, COUNT => 2**10-1)
+		port map    (EN => nRES, CLK => MCLK, Q => Q_DIV);
+	-- Internal CLK <= 1/2^6 MCLK (1MHz <- 67MHz)
+	
 	--	ADD_COUNT behavior:
 	--		Be set 00 on RES
 	-- 	Increase at the falling edge of the SYNC
 	ADDRESS_COUNTER: entity work.COUNTER_INC
-		generic map (WIDTH => 2, COUNT => 2)
+		generic map (WIDTH => 2, COUNT => 3)
 		port map    (EN => nRES, CLK => SYNC, Q => ADD_COUNT);
 
 
-	PRESCALER: entity work.COUNTER_INC
-		generic map (WIDTH => 10, COUNT => 2**10-1)
-		port map    (EN => nRES, CLK => MCLK, Q => Q_DIV);
--- Internal CLK <= 1/2^6 MCLK (1MHz <- 67MHz)
 	INT_CLK	<= Q_DIV(6) and CLK_EN;	-- CLK input for the sequencer
 
 	SEQUENCE_COUNTER: entity work.COUNTER_DEC
 		generic map (WIDTH => 6, COUNT => 33)
 		port map (EN=> nRES, CLK=> INT_CLK, Q => Q_SEQ);
+	-- 34th counter : 2x(word length+SYNC pulse)
 
-
-	-- Q_SEQ is the counter for all over sequience, 34th counter.
+	-- SEQUENCE_COUNTER is the counter for all over sequience, 34th counter.
 
    -- MSB of Q_SEQ is used for setup the SYNC signal 		Q_SEQ(5)
    -- LSB is used for the SCLK 									Q_SEQ(0)
    -- Middle of 4 bits are used as the index for a bit
 	--		to be send out in S_REG	 								Q_SEQ(4 downto 1)
 
-	-- Process (INT_CLK,nRES) begin
-	-- 	if (nRES='0') then
-	-- 		Q_SEQ	<=	"100001";
-	-- 	elsif (INT_CLK'event and INT_CLK='1') then
-	-- 		if (Q_SEQ="000000") then						-- 34th counter : 2x(word length+SYNC pulse)
-	-- 			Q_SEQ	<= "100001";
-	-- 		else
-	-- 			Q_SEQ	<=	Q_SEQ-'1';
-	-- 		end if;
-	-- 	end if;
-	-- end process;
+
 
 	SYNC	<=	Q_SEQ(5);
 	SCLK	<=	Q_SEQ(0);
@@ -103,10 +95,10 @@ begin
 
 	process (SYNC, nRES) begin
 		if (nRES='0') then
-			S_REG	<=	COMMAND(conv_integer(ADD_COUNT));
+			S_REG	<=	COMMAND(0);
 				-- set the first command at the time of RESET mode.
 
-		elsif (SYNC'event and SYNC='1') then
+		elsif (SYNC'event and SYNC='0') then
 			S_REG	<=	COMMAND(conv_integer(ADD_COUNT));
 				-- load the command at the rising edge of the SYNC
 
@@ -118,39 +110,17 @@ begin
 	--		CLK_EN is set to '1' when RES state
 	--		CLK_EN is changed based on the value of ADD_COUNT at the rising edge of the SYNC
 
-	process (SYNC, nRES) begin
+	process (INT_CLK,nRES) begin
 		if (nRES='0') then
-			CLK_EN	<=	'1';
-				-- enable CLK of the sequencer
-
-		elsif (SYNC'event and SYNC='1') then
-			if (ADD_COUNT=3) then
-				CLK_EN	<=	'0';
-			else
-				CLK_EN	<=	'1';
-			end if;
-				-- disable CLK of the sequencer when all the command (3words) were sent.
-
+			CLK_EN <='1';
+		elsif (INT_CLK'event and INT_CLK='0') then
+			CLK_EN <= not(ADD_COUNT(0) and ADD_COUNT(1));
 		end if;
 	end process;
 
-
-	--	ADD_COUNT behavior:
-	--		Be set 00 on RES
-	-- 	Increase at the falling edge of the SYNC
-
-	-- process(SYNC, nRES) begin
-	-- 	if (nRES='0') then
-	-- 		ADD_COUNT	<=	(others=>'0');
-	-- 	elsif (SYNC'event and SYNC='0') then
-	-- 		ADD_COUNT	<= ADD_COUNT+1;
-	-- 	end if;
-	-- end process;
-
-
 --	Output signals
 --
-	FSYNC	<=	SYNC or not(CLK_EN);
+	FSYNC	<=	SYNC;
 
 	PSEL	<= '0';
 	FSEL	<=	'0';

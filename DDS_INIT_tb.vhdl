@@ -31,7 +31,7 @@ signal SIM_END 		: boolean := false;
 constant PERIOD_A : time := 50 ns;
 
 -- total period of this simulation
-constant PERIOD_B : time := 10 us;
+constant PERIOD_B : time := 1500 us;
 
 begin
 	DUT:DDS_INIT
