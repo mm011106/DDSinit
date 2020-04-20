@@ -52,25 +52,21 @@ constant COMMAND : MEMORY := (
 	"0010000000100000", "0100000101000000", "0100000000000000", "0000000000000000");  -- 80HZ
 
 begin
+
+	--	ADD_COUNT behavior:
+	--		Be set 00 on RES
+	-- 	Increase at the falling edge of the SYNC
 	ADDRESS_COUNTER: entity work.COUNTER_INC
 		generic map (WIDTH => 2, COUNT => 2)
 		port map    (EN => nRES, CLK => SYNC, Q => ADD_COUNT);
 
+
 	PRESCALER: entity work.COUNTER_INC
 			generic map (WIDTH => 10, COUNT => 2**10-1)
 			port map    (EN => nRES, CLK => MCLK, Q => Q_DIV);
-
-	--	Prescaler
-	--
-	-- Process (MCLK, nRES) begin
-	-- 	if (nRES='0') then
-	-- 			Q_DIV	<=	(others=>'0');
-	-- 		elsif (MCLK'event and MCLK='1') then
-	-- 			Q_DIV	<=	Q_DIV+1;
-	-- 	end if;
-	-- end process;
-
+-- Internal CLK <= 1/2^6 MCLK (1MHz <- 67MHz)
 	INT_CLK	<= Q_DIV(6) and CLK_EN;	-- CLK input for the sequencer
+
 
 	-- Q_SEQ is the counter for all over sequience, 34th counter.
 
