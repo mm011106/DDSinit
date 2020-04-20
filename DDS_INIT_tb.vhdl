@@ -5,8 +5,8 @@ use IEEE.std_logic_unsigned.all;
 entity sim is
 end sim;
 
-architecture main of sim is
-component main
+architecture DDS_INIT of sim is
+component DDS_INIT
 	port(
 		-- inputs
 		nRES	: in std_logic;	-- This input MUST be Shumitt mode
@@ -73,4 +73,4 @@ begin
 			wait;
 	end process;
 
-end main;
+end DDS_INIT;
