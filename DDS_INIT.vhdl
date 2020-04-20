@@ -6,6 +6,7 @@
 --		Combine with ER50_WALZER
 --			REV 1.0	2015/02/06 Miyamoto
 --
+-- 		Revised : エンティティを使ってカウンターを外部ユニットとして一般化
 
 
 library IEEE;
@@ -51,16 +52,23 @@ constant COMMAND : MEMORY := (
 	"0010000000100000", "0100000101000000", "0100000000000000", "0000000000000000");  -- 80HZ
 
 begin
+	ADDRESS_COUNTER: entity work.COUNTER_INC
+		generic map (WIDTH => 2, COUNT => 3)
+		port map    (EN => nRES, CLK => SYNC, Q => ADD_COUNT);
+
+	PRESCALER: entity work.COUNTER_INC
+			generic map (WIDTH => 10, COUNT => 2**10-1)
+			port map    (EN => nRES, CLK => MCLK, Q => Q_DIV);
 
 	--	Prescaler
 	--
-	Process (MCLK, nRES) begin
-		if (nRES='0') then
-				Q_DIV	<=	(others=>'0');
-			elsif (MCLK'event and MCLK='1') then
-				Q_DIV	<=	Q_DIV+1;
-		end if;
-	end process;
+	-- Process (MCLK, nRES) begin
+	-- 	if (nRES='0') then
+	-- 			Q_DIV	<=	(others=>'0');
+	-- 		elsif (MCLK'event and MCLK='1') then
+	-- 			Q_DIV	<=	Q_DIV+1;
+	-- 	end if;
+	-- end process;
 
 	INT_CLK	<= Q_DIV(6) and CLK_EN;	-- CLK input for the sequencer
 
@@ -131,13 +139,13 @@ begin
 	--		Be set 00 on RES
 	-- 	Increase at the falling edge of the SYNC
 
-	process(SYNC, nRES) begin
-		if (nRES='0') then
-			ADD_COUNT	<=	(others=>'0');
-		elsif (SYNC'event and SYNC='0') then
-			ADD_COUNT	<= ADD_COUNT+1;
-		end if;
-	end process;
+	-- process(SYNC, nRES) begin
+	-- 	if (nRES='0') then
+	-- 		ADD_COUNT	<=	(others=>'0');
+	-- 	elsif (SYNC'event and SYNC='0') then
+	-- 		ADD_COUNT	<= ADD_COUNT+1;
+	-- 	end if;
+	-- end process;
 
 
 --	Output signals
