@@ -68,8 +68,8 @@ begin
 	INT_CLK	<= Q_DIV(6) and CLK_EN;	-- CLK input for the sequencer
 
 	SEQUENCE_COUNTER: entity work.COUNTER_DEC
-		generic map (WIDTH => 5, COUNT => 33)
-		port map (EN=> nRES, CLK=INT_CLK, Q => Q_SEQ);
+		generic map (WIDTH => 6, COUNT => 33)
+		port map (EN=> nRES, CLK=> INT_CLK, Q => Q_SEQ);
 
 
 	-- Q_SEQ is the counter for all over sequience, 34th counter.
