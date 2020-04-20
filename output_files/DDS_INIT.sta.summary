@@ -1,0 +1,49 @@
+------------------------------------------------------------
+Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Setup 'CLK_EN'
+Slack : -11.810
+TNS   : -58.373
+
+Type  : Setup 'Q_SEQ[5]'
+Slack : -7.566
+TNS   : -30.082
+
+Type  : Setup 'MCLK'
+Slack : -6.437
+TNS   : -40.679
+
+Type  : Hold 'CLK_EN'
+Slack : -2.076
+TNS   : -5.508
+
+Type  : Hold 'Q_SEQ[5]'
+Slack : 1.728
+TNS   : 0.000
+
+Type  : Hold 'MCLK'
+Slack : 5.243
+TNS   : 0.000
+
+Type  : Recovery 'Q_SEQ[5]'
+Slack : -11.301
+TNS   : -29.357
+
+Type  : Removal 'Q_SEQ[5]'
+Slack : 6.175
+TNS   : 0.000
+
+Type  : Minimum Pulse Width 'MCLK'
+Slack : -2.289
+TNS   : -2.289
+
+Type  : Minimum Pulse Width 'CLK_EN'
+Slack : 0.161
+TNS   : 0.000
+
+Type  : Minimum Pulse Width 'Q_SEQ[5]'
+Slack : 0.161
+TNS   : 0.000
+
+------------------------------------------------------------

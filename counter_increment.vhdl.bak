@@ -1,7 +1,7 @@
 --
 --  Inremental Counter of WIDTH bit , counts 0 to COUNT
 --
--- input CLK, EN
+-- input CLK, DISABLE
 --   counts at the positive edge of CLK input,
 --   counter is disable and reset to zero while EN = '0'
 -- output Q(WIDTH downto 0)
@@ -29,7 +29,7 @@ architecture RTL of COUNTER_INC is
 
 begin
 
-  Process (CLK,EN) begin
+  Process (CLK,DISABLE) begin
 		if (EN='0') then
       for I in 0 to WIDTH-1 loop
         Q_INT(I)	<= '0';

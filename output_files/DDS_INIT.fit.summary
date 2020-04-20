@@ -1,0 +1,11 @@
+Fitter Status : Successful - Mon Apr 20 11:15:42 2020
+Quartus Prime Version : 19.1.0 Build 670 09/22/2019 SJ Lite Edition
+Revision Name : DDS_INIT
+Top-level Entity Name : DDS_INIT
+Family : MAX V
+Device : 5M80ZT100C5
+Timing Models : Final
+Total logic elements : 32 / 80 ( 40 % )
+Total pins : 8 / 79 ( 10 % )
+Total virtual pins : 0
+UFM blocks : 0 / 1 ( 0 % )
