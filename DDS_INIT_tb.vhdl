@@ -34,7 +34,7 @@ constant PERIOD_A : time := 50 ns;
 constant PERIOD_B : time := 10 us;
 
 begin
-	DUT:main
+	DUT:DDS_INIT
  		port map(
 
 			MCLK => tb_CLK,
