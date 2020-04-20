@@ -68,7 +68,7 @@ begin
 	INT_CLK	<= Q_DIV(6) and CLK_EN;	-- CLK input for the sequencer
 
 	SEQUENCE_COUNTER: entity work.COUNTER_DEC
-		generic map (WIDTH => 5, COUNT => 32)
+		generic map (WIDTH => 5, COUNT => 33)
 		port map (EN=> nRES, CLK=INT_CLK, Q => Q_SEQ);
 
 
