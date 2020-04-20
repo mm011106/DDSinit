@@ -31,14 +31,10 @@ begin
 
   Process (CLK,EN) begin
 		if (EN='0') then
-      for I in 0 to WIDTH-1 loop
         Q_INT <= CONV_std_logic_vector(COUNT,WIDTH);
-      end loop;
 		elsif (CLK'event and CLK='1') then
 			if (Q_INT =  CONV_std_logic_vector(0,WIDTH)) then
-        for I in 0 to WIDTH-1 loop
-          Q_INT <= CONV_std_logic_vector(COUNT,WIDTH);
-        end loop;
+				Q_INT <= CONV_std_logic_vector(COUNT,WIDTH);
 			else
 				Q_INT	<=	Q_INT - '1';
 			end if;
