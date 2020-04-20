@@ -56,7 +56,7 @@ begin
 
 	PRESCALER: entity work.COUNTER_INC
 		generic map (WIDTH => 10, COUNT => 2**10-1)
-		port map    (EN => nRES, CLK => MCLK, Q => Q_DIV);
+		port map    (EN => (nRES and CLK_EN), CLK => MCLK, Q => Q_DIV);
 	-- Internal CLK <= 1/2^6 MCLK (1MHz <- 67MHz)
 
 	--	ADD_COUNT behavior:
@@ -67,7 +67,7 @@ begin
 		port map    (EN => nRES, CLK => SYNC, Q => ADD_COUNT);
 
 
-	INT_CLK	<= Q_DIV(6) and CLK_EN;	-- CLK input for the sequencer
+	INT_CLK	<= Q_DIV(6); -- and CLK_EN;	-- CLK input for the sequencer
 
 	SEQUENCE_COUNTER: entity work.COUNTER_DEC
 		generic map (WIDTH => 6, COUNT => 33)
