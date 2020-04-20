@@ -51,7 +51,7 @@ begin
 	begin
 		wait for PERIOD_A;
 		-- Enable counters
-		nRES <= '1';
+		tb_nRES <= '1';
 
 		loop
 			wait for PERIOD_A;
