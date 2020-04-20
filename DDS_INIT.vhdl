@@ -67,6 +67,10 @@ begin
 -- Internal CLK <= 1/2^6 MCLK (1MHz <- 67MHz)
 	INT_CLK	<= Q_DIV(6) and CLK_EN;	-- CLK input for the sequencer
 
+	SEQUENCE_COUNTER: entity work.COUNTER_DEC
+		generic map (WIDTH => 5, COUNT => 32)
+		port map (EN=> nRES, CLK=INT_CLK, Q => Q_SEQ);
+
 
 	-- Q_SEQ is the counter for all over sequience, 34th counter.
 
@@ -75,17 +79,17 @@ begin
    -- Middle of 4 bits are used as the index for a bit
 	--		to be send out in S_REG	 								Q_SEQ(4 downto 1)
 
-	Process (INT_CLK,nRES) begin
-		if (nRES='0') then
-			Q_SEQ	<=	"100001";
-		elsif (INT_CLK'event and INT_CLK='1') then
-			if (Q_SEQ="000000") then						-- 34th counter : 2x(word length+SYNC pulse)
-				Q_SEQ	<= "100001";
-			else
-				Q_SEQ	<=	Q_SEQ-'1';
-			end if;
-		end if;
-	end process;
+	-- Process (INT_CLK,nRES) begin
+	-- 	if (nRES='0') then
+	-- 		Q_SEQ	<=	"100001";
+	-- 	elsif (INT_CLK'event and INT_CLK='1') then
+	-- 		if (Q_SEQ="000000") then						-- 34th counter : 2x(word length+SYNC pulse)
+	-- 			Q_SEQ	<= "100001";
+	-- 		else
+	-- 			Q_SEQ	<=	Q_SEQ-'1';
+	-- 		end if;
+	-- 	end if;
+	-- end process;
 
 	SYNC	<=	Q_SEQ(5);
 	SCLK	<=	Q_SEQ(0);
