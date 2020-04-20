@@ -53,7 +53,7 @@ constant COMMAND : MEMORY := (
 
 begin
 	ADDRESS_COUNTER: entity work.COUNTER_INC
-		generic map (WIDTH => 2, COUNT => 3)
+		generic map (WIDTH => 2, COUNT => 2)
 		port map    (EN => nRES, CLK => SYNC, Q => ADD_COUNT);
 
 	PRESCALER: entity work.COUNTER_INC
