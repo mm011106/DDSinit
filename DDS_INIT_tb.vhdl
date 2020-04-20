@@ -51,12 +51,12 @@ begin
 	begin
 		wait for PERIOD_A;
 		-- Enable counters
-		nEN <= '0';
+		nRES <= '1';
 
 		loop
 			wait for PERIOD_A;
 
-			CLK <= not(CLK);
+			tb_CLK <= not(tb_CLK);
 
 			if (SIM_END) then
 				wait;
