@@ -34,3 +34,8 @@
 
 # text file
 !*.txt
+
+# diagrams
+!*.svg
+!*.png
+!*.pdf
