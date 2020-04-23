@@ -22,17 +22,17 @@ use IEEE.std_logic_arith.all;
 use IEEE.numeric_std.all;
 
 entity DDS_INIT is
-		generic ( N	:	integer	:= 4); -- word length 2**N e.g. 16bit incase of N=4
-		port	(
-					-- inputs
-					nRES	: in std_logic;	-- This input MUST be Shumitt mode
-					MCLK	: in std_logic;
+	generic ( N	:	integer	:= 4); -- word length 2**N e.g. 16bit incase of N=4
+	port	(
+				-- inputs
+				nRES	: in std_logic;	-- This input MUST be Shumitt mode
+				MCLK	: in std_logic;
 
-					--	DDS control
-					PSEL, FSEL, RESET, SDATA, SCLK, FSYNC	: out std_logic
-													-- Please refer the manual of AD9834(analog devices)
+				--	DDS control
+				PSEL, FSEL, RESET, SDATA, SCLK, FSYNC	: out std_logic
+												-- Please refer the manual of AD9834(analog devices)
 
-			);
+		);
 end DDS_INIT;
 
 
@@ -57,10 +57,9 @@ type MEMORY is array (0 to 2) of WORD;
 --constant COMMAND : MEMORY := (X"2020", X"4140", X"4000");  -- 80Hz
 
 constant COMMAND : MEMORY := (X"2020",
-										X"4000"+(CONV_std_logic_vector(FREQUENCY*4,14)), 
+										X"4000"+(CONV_std_logic_vector(FREQUENCY*4,14)),
 										X"4000"+(CONV_std_logic_vector(FREQUENCY/4096,14))
 										);
-								
 										-- Command, FREQ0(LSB14), FREQ0(MSB14)
 
 begin
@@ -69,17 +68,16 @@ begin
 		generic map (WIDTH => 10, COUNT => 2**10-1)
 		port map    (EN => EN_PRESCALER, CLK => MCLK, Q => Q_DIV);
 	-- Internal CLK <= 1/2^6 MCLK (1MHz <- 67MHz)
-	
+
 	EN_PRESCALER <= nRES and CLK_EN;
 	INT_CLK	<= Q_DIV(6); -- and CLK_EN;	-- CLK input for the sequencer
-	
+
 	--	ADD_COUNT behavior:
 	--		Be set 00 on RES
 	-- 	Increase at the up edge of the SYNC
 	ADDRESS_COUNTER: entity work.COUNTER_INC
 		generic map (WIDTH => 2, COUNT => 3)
 		port map    (EN => nRES, CLK => SYNC, Q => ADD_COUNT);
-
 
 
 	SEQUENCE_COUNTER: entity work.COUNTER_DEC
@@ -108,11 +106,9 @@ begin
 		if (nRES='0') then
 			S_REG	<=	COMMAND(0);
 				-- set the first command at the time of RESET mode.
-
 		elsif (SYNC'event and SYNC='0') then
 			S_REG	<=	COMMAND(conv_integer(ADD_COUNT));
 				-- load the command at the rising edge of the SYNC
-
 		end if;
 	end process;
 
@@ -132,12 +128,8 @@ begin
 --	Output signals
 --
 	FSYNC	<=	SYNC;
-
 	PSEL	<= 	'0';
 	FSEL	<= 	'0';
-
 	RESET	<=	not(nRES);
-
-
 
 end Behavioral;
