@@ -7,12 +7,19 @@
 --			REV 1.0	2015/02/06 Miyamoto
 --
 -- 	Revised : エンティティを使ってカウンターを外部ユニットとして一般化
+--						周波数設定をCONSTANTに
+--
 --			REV 2.0 2020/04/20 Miyamoto
 --
+--	REF: AD9834 Data Sheet (Analog Devices)
+--		https://strawberry-linux.com/pub/AD9834_JP.pdf
+--    https://strawberry-linux.com/catalog/items?code=57090
 
 library IEEE;
 use IEEE.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
+use IEEE.std_logic_unsigned.all;
+use IEEE.std_logic_arith.all;
+use IEEE.numeric_std.all;
 
 entity DDS_INIT is
 		generic ( N	:	integer	:= 4); -- word length 2**N e.g. 16bit incase of N=4
@@ -41,33 +48,39 @@ signal	S_REG:		std_logic_vector(2**N-1 downto 0);	-- Output Register
 signal	SYNC:			std_logic;	-- Sync signal (internal)
 signal	INT_CLK:		std_logic;	-- Scaled CLK
 signal	CLK_EN:		std_logic;
+signal	EN_PRESCALER:	std_logic;
 
-
+constant	FREQUENCY:	integer:=80;	-- DDS output Frequency /Hz
 
 subtype WORD is std_logic_vector(2**N-1 downto 0);
-type MEMORY is array (0 to 3) of WORD;
---constant COMMAND : MEMORY := (
---	"0010000000100000", "0100000000101100", "0100000000000000", "0000000000000000");  -- 11Hz
+type MEMORY is array (0 to 2) of WORD;
+--constant COMMAND : MEMORY := (X"2020", X"4140", X"4000");  -- 80Hz
 
-constant COMMAND : MEMORY := (
-	"0010000000100000", "0100000101000000", "0100000000000000", "0000000000000000");  -- 80HZ
+constant COMMAND : MEMORY := (X"2020",
+										X"4000"+(CONV_std_logic_vector(FREQUENCY*4,14)), 
+										X"4000"+(CONV_std_logic_vector(FREQUENCY/4096,14))
+										);
+								
+										-- Command, FREQ0(LSB14), FREQ0(MSB14)
 
 begin
 
 	PRESCALER: entity work.COUNTER_INC
 		generic map (WIDTH => 10, COUNT => 2**10-1)
-		port map    (EN => (nRES and CLK_EN), CLK => MCLK, Q => Q_DIV);
+		port map    (EN => EN_PRESCALER, CLK => MCLK, Q => Q_DIV);
 	-- Internal CLK <= 1/2^6 MCLK (1MHz <- 67MHz)
-
+	
+	EN_PRESCALER <= nRES and CLK_EN;
+	INT_CLK	<= Q_DIV(6); -- and CLK_EN;	-- CLK input for the sequencer
+	
 	--	ADD_COUNT behavior:
 	--		Be set 00 on RES
-	-- 	Increase at the falling edge of the SYNC
+	-- 	Increase at the up edge of the SYNC
 	ADDRESS_COUNTER: entity work.COUNTER_INC
 		generic map (WIDTH => 2, COUNT => 3)
 		port map    (EN => nRES, CLK => SYNC, Q => ADD_COUNT);
 
 
-	INT_CLK	<= Q_DIV(6); -- and CLK_EN;	-- CLK input for the sequencer
 
 	SEQUENCE_COUNTER: entity work.COUNTER_DEC
 		generic map (WIDTH => 6, COUNT => 33)
@@ -80,8 +93,6 @@ begin
    -- LSB is used for the SCLK 									Q_SEQ(0)
    -- Middle of 4 bits are used as the index for a bit
 	--		to be send out in S_REG	 								Q_SEQ(4 downto 1)
-
-
 
 	SYNC	<=	Q_SEQ(5);
 	SCLK	<=	Q_SEQ(0);
