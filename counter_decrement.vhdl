@@ -9,8 +9,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.std_logic_unsigned.all;
-use IEEE.std_logic_arith.all;
+use IEEE.numeric_std.all;
 
 entity COUNTER_DEC is
   generic (
@@ -20,27 +19,27 @@ entity COUNTER_DEC is
   port (
     EN: in std_logic;
     CLK: in std_logic;
-    Q: out std_logic_vector(WIDTH-1 downto 0)
+    Q: out unsigned(WIDTH-1 downto 0)
   );
 end COUNTER_DEC;
 
 architecture RTL of COUNTER_DEC is
-	signal Q_INT :std_logic_vector(WIDTH-1 downto 0);
+	signal Q_INT : integer range 0 to COUNT;
 
 begin
 
   Process (CLK,EN) begin
 		if (EN='0') then
-        Q_INT <= CONV_std_logic_vector(COUNT,WIDTH);
+      Q_INT <= COUNT;
 		elsif (CLK'event and CLK='1') then
-			if (Q_INT =  CONV_std_logic_vector(0,WIDTH)) then
-				Q_INT <= CONV_std_logic_vector(COUNT,WIDTH);
+			if (Q_INT = 0) then
+				Q_INT <= COUNT;
 			else
-				Q_INT	<=	Q_INT - '1';
+				Q_INT	<=	Q_INT - 1;
 			end if;
 		end if;
 	end process;
 
-	Q <= Q_INT;
+	Q <= to_unsigned(Q_INT, WIDTH);
 
 end RTL;
