@@ -39,15 +39,15 @@ end DDS_INIT;
 architecture Behavioral of DDS_INIT is
 
 --  internal signal
-signal 	Q_DIV:		unsigned(9	downto 0);		-- prescaler for MCLK
+signal 	Q_DIV:			unsigned(9	downto 0);		-- prescaler for MCLK
 
-signal	Q_SEQ:		unsigned(N+1 downto 0);		-- Sequience counter
+signal	Q_SEQ:			unsigned(N+1 downto 0);		-- Sequience counter
 signal 	ADD_COUNT:	unsigned(1 downto 0);			-- Address counter for COMMAND words
-signal	S_REG:		std_logic_vector(2**N-1 downto 0);	-- Output Register
+signal	S_REG:			std_logic_vector(2**N-1 downto 0);	-- Output Register
 
-signal	SYNC:			std_logic;	-- Sync signal (internal)
-signal	INT_CLK:		std_logic;	-- Scaled CLK
-signal	CLK_EN:		std_logic;
+signal	SYNC:					std_logic;	-- Sync signal (internal)
+signal	INT_CLK:			std_logic;	-- Scaled CLK
+signal	CLK_EN:				std_logic;
 signal	EN_PRESCALER:	std_logic;
 
 constant	FREQUENCY:	integer:=85;	-- DDS output Frequency /Hz
