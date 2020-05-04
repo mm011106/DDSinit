@@ -10,6 +10,9 @@
 --						周波数設定をCONSTANTに
 --
 --			REV 2.0 2020/04/20 Miyamoto
+-- 			REV 2.1 2020/05/04 Miyamoto
+-- 				ライブラリをnumeric_stdに変更　コンフリクトを防止　変数の型指定の明確化
+-- 				Checked by modelSIM.
 --
 --	REF: AD9834 Data Sheet (Analog Devices)
 --		https://strawberry-linux.com/pub/AD9834_JP.pdf
@@ -17,24 +20,20 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
---use IEEE.std_logic_unsigned.all;
---use IEEE.std_logic_arith.all;
 use IEEE.numeric_std.all;
 
 entity DDS_INIT is
 	generic ( N	:	integer	:= 4); -- word length 2**N e.g. 16bit incase of N=4
 	port	(
-				-- inputs
-				nRES	: in std_logic;	-- This input MUST be Shumitt mode
-				MCLK	: in std_logic;
+		-- inputs
+		nRES	: in std_logic;	-- This input MUST be Shumitt mode
+		MCLK	: in std_logic;
 
-				--	DDS control
-				PSEL, FSEL, RESET, SDATA, SCLK, FSYNC	: out std_logic
-												-- Please refer the manual of AD9834(analog devices)
-
+		--	DDS control
+		PSEL, FSEL, RESET, SDATA, SCLK, FSYNC	: out std_logic
+										-- Please refer the manual of AD9834(analog devices)
 		);
 end DDS_INIT;
-
 
 architecture Behavioral of DDS_INIT is
 
@@ -50,7 +49,7 @@ signal	INT_CLK:			std_logic;	-- Scaled CLK
 signal	CLK_EN:				std_logic;
 signal	EN_PRESCALER:	std_logic;
 
-constant	FREQUENCY:	integer:=85;	-- DDS output Frequency /Hz
+constant	FREQUENCY:	integer:=80;	-- DDS output Frequency /Hz
 
 subtype WORD is std_logic_vector(2**N-1 downto 0);
 type MEMORY is array (0 to 2) of WORD;
