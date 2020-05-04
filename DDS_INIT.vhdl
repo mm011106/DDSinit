@@ -10,6 +10,9 @@
 --						周波数設定をCONSTANTに
 --
 --			REV 2.0 2020/04/20 Miyamoto
+-- 			REV 2.1 2020/05/04 Miyamoto
+-- 				ライブラリをnumeric_stdに変更　コンフリクトを防止　変数の型指定の明確化
+-- 				Checked by modelSIM.
 --
 --	REF: AD9834 Data Sheet (Analog Devices)
 --		https://strawberry-linux.com/pub/AD9834_JP.pdf
@@ -17,37 +20,33 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.std_logic_unsigned.all;
-use IEEE.std_logic_arith.all;
 use IEEE.numeric_std.all;
 
 entity DDS_INIT is
 	generic ( N	:	integer	:= 4); -- word length 2**N e.g. 16bit incase of N=4
 	port	(
-				-- inputs
-				nRES	: in std_logic;	-- This input MUST be Shumitt mode
-				MCLK	: in std_logic;
+		-- inputs
+		nRES	: in std_logic;	-- This input MUST be Shumitt mode
+		MCLK	: in std_logic;
 
-				--	DDS control
-				PSEL, FSEL, RESET, SDATA, SCLK, FSYNC	: out std_logic
-												-- Please refer the manual of AD9834(analog devices)
-
+		--	DDS control
+		PSEL, FSEL, RESET, SDATA, SCLK, FSYNC	: out std_logic
+										-- Please refer the manual of AD9834(analog devices)
 		);
 end DDS_INIT;
-
 
 architecture Behavioral of DDS_INIT is
 
 --  internal signal
-signal 	Q_DIV:		std_logic_vector(9	downto 0);		-- prescaler for MCLK
+signal 	Q_DIV:			unsigned(9	downto 0);		-- prescaler for MCLK
 
-signal	Q_SEQ:		std_logic_vector(N+1 downto 0);		-- Sequience counter
-signal 	ADD_COUNT:	std_logic_vector(1 downto 0);			-- Address counter for COMMAND words
-signal	S_REG:		std_logic_vector(2**N-1 downto 0);	-- Output Register
+signal	Q_SEQ:			unsigned(N+1 downto 0);		-- Sequience counter
+signal 	ADD_COUNT:	unsigned(1 downto 0);			-- Address counter for COMMAND words
+signal	S_REG:			std_logic_vector(2**N-1 downto 0);	-- Output Register
 
-signal	SYNC:			std_logic;	-- Sync signal (internal)
-signal	INT_CLK:		std_logic;	-- Scaled CLK
-signal	CLK_EN:		std_logic;
+signal	SYNC:					std_logic;	-- Sync signal (internal)
+signal	INT_CLK:			std_logic;	-- Scaled CLK
+signal	CLK_EN:				std_logic;
 signal	EN_PRESCALER:	std_logic;
 
 constant	FREQUENCY:	integer:=80;	-- DDS output Frequency /Hz
@@ -57,8 +56,8 @@ type MEMORY is array (0 to 2) of WORD;
 --constant COMMAND : MEMORY := (X"2020", X"4140", X"4000");  -- 80Hz
 
 constant COMMAND : MEMORY := (X"2020",
-										X"4000"+(CONV_std_logic_vector(FREQUENCY*4,14)),
-										X"4000"+(CONV_std_logic_vector(FREQUENCY/4096,14))
+										std_logic_vector(to_unsigned(16384 + FREQUENCY*4,   16)),
+										std_logic_vector(to_unsigned(16384 + FREQUENCY/4096,16))
 										);
 										-- Command, FREQ0(LSB14), FREQ0(MSB14)
 
@@ -100,14 +99,14 @@ begin
 	--		Sync load on the rising edge of the SYNC
 	--    Always S_REG(INDEX) is appeared on the SDATA
 
-	SDATA	<=	S_REG(conv_integer(Q_SEQ(4 downto 1)));
+	SDATA	<=	S_REG(to_integer(unsigned(Q_SEQ(4 downto 1))));
 
 	process (SYNC, nRES) begin
 		if (nRES='0') then
 			S_REG	<=	COMMAND(0);
 				-- set the first command at the time of RESET mode.
 		elsif (SYNC'event and SYNC='0') then
-			S_REG	<=	COMMAND(conv_integer(ADD_COUNT));
+			S_REG	<=	COMMAND(to_integer(ADD_COUNT));
 				-- load the command at the rising edge of the SYNC
 		end if;
 	end process;
